@@ -8,4 +8,4 @@ resources:
   - ingress-preview.yaml
 images:
   - name: registry.144.91.77.245.sslip.io/toastermovie
-    newTag: bootstrap
+    newTag: f87f731d4b8286af65c1e12dd911c19d0cdc81ea
