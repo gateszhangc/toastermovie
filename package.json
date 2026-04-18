@@ -1,8 +1,8 @@
 {
-  "name": "artemis-2-wallpaper",
+  "name": "toastermovie",
   "version": "1.0.0",
   "private": true,
-  "description": "Static Artemis II wallpaper site built from publicly released NASA imagery.",
+  "description": "Static editorial archive for the 2026 Netflix film Toaster.",
   "scripts": {
     "start": "node server.js",
     "test": "playwright test",

@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: toastermovie-www-redirect
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/permanent-redirect: https://toastermovie.lol$request_uri
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - www.toastermovie.lol
+      secretName: toastermovie-www-live-tls
+  rules:
+    - host: www.toastermovie.lol
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: toastermovie
+                port:
+                  number: 80

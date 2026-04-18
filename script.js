@@ -1,41 +1,44 @@
-const topbar = document.querySelector("[data-topbar]");
-const filterButtons = Array.from(document.querySelectorAll(".filter-button"));
-const wallpaperCards = Array.from(document.querySelectorAll(".wallpaper-card"));
+const buttons = Array.from(document.querySelectorAll("[data-filter-button]"));
+const cards = Array.from(document.querySelectorAll("[data-category]"));
 const resultsCount = document.querySelector("[data-results-count]");
-const yearNode = document.querySelector("#current-year");
+const topbar = document.querySelector("[data-topbar]");
 
-const updateResults = (filter) => {
-  let visible = 0;
+const updateResults = (activeFilter) => {
+  let visibleCount = 0;
 
-  wallpaperCards.forEach((card) => {
-    const tags = (card.dataset.tags || "").split(" ");
-    const matches = filter === "all" || tags.includes(filter);
+  cards.forEach((card) => {
+    const matches = activeFilter === "all" || card.dataset.category === activeFilter;
     card.hidden = !matches;
-    if (matches) visible += 1;
+
+    if (matches) {
+      visibleCount += 1;
+    }
   });
 
   if (resultsCount) {
-    resultsCount.textContent = `Showing ${visible} wallpaper${visible === 1 ? "" : "s"}`;
+    const label = visibleCount === 1 ? "item" : "items";
+    resultsCount.textContent = `Showing ${visibleCount} archive ${label}`;
   }
 };
 
-filterButtons.forEach((button) => {
+buttons.forEach((button) => {
   button.addEventListener("click", () => {
-    filterButtons.forEach((entry) => entry.classList.remove("is-active"));
-    button.classList.add("is-active");
-    updateResults(button.dataset.filter || "all");
+    buttons.forEach((candidate) => {
+      candidate.setAttribute("aria-pressed", String(candidate === button));
+    });
+
+    updateResults(button.dataset.filterButton);
   });
 });
 
-if (yearNode) {
-  yearNode.textContent = new Date().getFullYear();
-}
+const syncTopbar = () => {
+  if (!topbar) {
+    return;
+  }
 
-const handleScroll = () => {
-  if (!topbar) return;
   topbar.classList.toggle("is-scrolled", window.scrollY > 12);
 };
 
-window.addEventListener("scroll", handleScroll, { passive: true });
-handleScroll();
+window.addEventListener("scroll", syncTopbar, { passive: true });
+syncTopbar();
 updateResults("all");

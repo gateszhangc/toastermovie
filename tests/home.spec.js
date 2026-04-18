@@ -1,28 +1,32 @@
 const { test, expect } = require("@playwright/test");
 
-test.describe("Artemis II wallpaper site", () => {
-  test("desktop homepage renders key content and filters wallpapers", async ({ page }) => {
+test.describe("Toaster Movie site", () => {
+  test("desktop homepage renders key SEO and archive content", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page).toHaveTitle(/Artemis II Wallpaper/i);
-    await expect(page.locator("h1")).toHaveText("Artemis II Wallpaper");
-    await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /publicly released NASA mission imagery/i);
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://artemis-2-wallpaper.lol/");
+    await expect(page).toHaveTitle(/Toaster Movie/i);
+    await expect(page.locator("h1")).toHaveText("Toaster Movie");
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /official Toaster movie stills/i);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://toastermovie.lol/");
+    await expect(page.getByText("Independent editorial archive. Not an official Netflix website.")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Watch on Netflix" })).toHaveAttribute("href", /netflix\.com\/title\/81779444/);
 
-    const wallpaperCards = page.locator(".wallpaper-card");
-    await expect(wallpaperCards).toHaveCount(10);
-    await expect(page.getByText("Not an official NASA website.")).toBeVisible();
+    const cards = page.locator(".gallery-card");
+    await expect(cards).toHaveCount(7);
 
-    await page.getByRole("button", { name: "Posters" }).click();
-    await expect(page.locator(".wallpaper-card:not([hidden])")).toHaveCount(2);
-    await expect(page.locator("[data-results-count]")).toHaveText("Showing 2 wallpapers");
+    await page.getByRole("button", { name: "Title Art" }).click();
+    await expect(page.locator(".gallery-card:not([hidden])")).toHaveCount(2);
+    await expect(page.locator("[data-results-count]")).toHaveText("Showing 2 archive items");
+
+    await page.getByRole("button", { name: "Stills" }).click();
+    await expect(page.locator(".gallery-card:not([hidden])")).toHaveCount(2);
 
     await page.getByRole("button", { name: "All" }).click();
-    await expect(page.locator(".wallpaper-card:not([hidden])")).toHaveCount(10);
+    await expect(page.locator(".gallery-card:not([hidden])")).toHaveCount(7);
 
-    for (const image of await page.locator("img").all()) {
-      await image.scrollIntoViewIfNeeded();
-    }
+    const ldJsonTexts = await page.locator('script[type="application/ld+json"]').allTextContents();
+    expect(ldJsonTexts.some((text) => text.includes('"@type": "Movie"'))).toBe(true);
+    expect(ldJsonTexts.some((text) => text.includes('"@type": "FAQPage"'))).toBe(true);
 
     const imagesLoaded = await page.evaluate(() =>
       Array.from(document.images).every((image) => image.complete && image.naturalWidth > 0)
@@ -30,7 +34,7 @@ test.describe("Artemis II wallpaper site", () => {
     expect(imagesLoaded).toBe(true);
   });
 
-  test("mobile layout stays within viewport and keeps gallery accessible", async ({ browser }) => {
+  test("mobile layout stays within the viewport and keeps archive reachable", async ({ browser }) => {
     const context = await browser.newContext({
       viewport: { width: 390, height: 844 },
       isMobile: true
@@ -40,16 +44,14 @@ test.describe("Artemis II wallpaper site", () => {
     await page.goto("/");
 
     await expect(page.locator("h1")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Explore the Collection" })).toBeVisible();
-    await page.getByRole("link", { name: "Explore the Collection" }).click();
-    await expect(page.locator("#gallery")).toBeInViewport();
+    await expect(page.getByRole("link", { name: "Browse Official Stills" })).toBeVisible();
+    await page.getByRole("link", { name: "Browse Official Stills" }).click();
+    await expect(page.locator("#stills")).toBeInViewport();
 
-    const overflow = await page.evaluate(() => {
-      return document.documentElement.scrollWidth - window.innerWidth;
-    });
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);
 
-    await expect(page.locator(".wallpaper-card")).toHaveCount(10);
+    await expect(page.locator(".gallery-card")).toHaveCount(7);
     await context.close();
   });
 });

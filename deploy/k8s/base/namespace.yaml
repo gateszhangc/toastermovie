@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: toastermovie
+  labels:
+    app.kubernetes.io/name: toastermovie
+    app.kubernetes.io/part-of: toastermovie

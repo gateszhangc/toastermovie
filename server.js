@@ -2,7 +2,7 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
-const host = process.env.HOSTNAME || "0.0.0.0";
+const host = "0.0.0.0";
 const port = Number(process.env.PORT || 3000);
 const root = __dirname;
 
@@ -10,6 +10,7 @@ const contentTypes = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
   ".ico": "image/x-icon",
+  ".jpg": "image/jpeg",
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".manifest": "application/manifest+json; charset=utf-8",
@@ -18,7 +19,7 @@ const contentTypes = {
   ".txt": "text/plain; charset=utf-8",
   ".ttf": "font/ttf",
   ".webmanifest": "application/manifest+json; charset=utf-8",
-  ".webp": "image/webp",
+  ".woff2": "font/woff2",
   ".xml": "application/xml; charset=utf-8"
 };
 
